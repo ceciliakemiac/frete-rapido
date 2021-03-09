@@ -1,0 +1,13 @@
+version: '3.3'
+
+services:
+    postgres:
+        image: postgres:12-alpine
+        ports:
+            - "5435:5432"
+        environment:
+            POSTGRES_DB: frete-rapido-desafio
+            POSTGRES_USER: user
+            POSTGRES_PASSWORD: password
+        container_name: postgres-fr
+      
