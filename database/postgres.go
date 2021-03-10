@@ -6,11 +6,12 @@ import (
 	"os"
 	"strings"
 
+	"github.com/ceciliakemiac/frete-rapido/model"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
-func GetPostgresConnection() (db *gorm.DB, err error) {
+func SetupDatabase() (db *gorm.DB, err error) {
 	addr := strings.Split(os.Getenv("POSTGRES_ADDR"), ":")
 	user := os.Getenv("POSTGRES_USERNAME")
 	password := os.Getenv("POSTGRES_PASSWORD")
@@ -22,7 +23,13 @@ func GetPostgresConnection() (db *gorm.DB, err error) {
 		PrepareStmt: true,
 	}); err != nil {
 		log.Println("Error getting Postgres Connection: ", err)
-		return
+		return nil, err
+	}
+
+	err = db.AutoMigrate(&model.Quote{}, &model.Freight{})
+	if err != nil {
+		log.Println("Error migrating datagabe: ", err)
+		return nil, err
 	}
 
 	return db, nil

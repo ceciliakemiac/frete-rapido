@@ -3,6 +3,7 @@ package cmd
 import (
 	"log"
 
+	"github.com/ceciliakemiac/frete-rapido/database"
 	"github.com/joho/godotenv"
 	"github.com/spf13/cobra"
 )
@@ -22,4 +23,10 @@ func init() {
 	if err != nil {
 		log.Println("Error loading .env file: ", err)
 	}
+
+	_, err = database.SetupDatabase()
+	if err != nil {
+		log.Fatal(err)
+	}
+
 }
