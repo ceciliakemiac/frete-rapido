@@ -16,3 +16,6 @@ restart-deps:
 	make stop-deps
 	make start-deps
 
+run-server:
+	go run main.go server
+
