@@ -20,7 +20,15 @@ COPY . .
 # Build the application
 RUN go build -o main . 
 
-WORKDIR /exec
-COPY --from=builder /build .
+# Move to /dist directory as the place for resulting binary folder
+WORKDIR /dist
 
-ENTRYPOINT ["/exec/main"] 
+# Copy binary from build to main folder
+RUN cp /build/main .
+
+# Build a small image
+FROM scratch
+
+COPY --from=builder /dist/ /
+
+ENTRYPOINT ["/main"] 

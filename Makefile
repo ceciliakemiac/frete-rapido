@@ -1,5 +1,5 @@
 docker-build:
-	@docker build -t frete-analyzer-api .
+	@docker build -t frete-rapido-api .
 
 start-deps:
 	@echo "Starting dependencies..."

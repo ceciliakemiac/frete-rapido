@@ -11,4 +11,18 @@ services:
             POSTGRES_PASSWORD: password
         container_name: postgres-fr
         restart: always
+
+    server:
+        image: frete-rapido-api 
+        command: server
+        environment: 
+            POSTGRES_ADDR: postgres-fr:5432
+            API_ADDR: :9095
+        env_file: ./.env
+        ports:
+          - "9095:9095"
+        restart: always
+        depends_on: [postgres]
+        container_name: server-fr
+
       

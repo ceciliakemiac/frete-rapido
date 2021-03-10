@@ -25,10 +25,16 @@ func NewController(router *mux.Router, db *gorm.DB) *Controller {
 	basePath := c.router.PathPrefix("/api").Subrouter()
 	basePath.Path("").HandlerFunc(c.Ping).Methods(http.MethodGet)
 
+	basePath.Path("/quote").HandlerFunc(c.PostQuote).Methods(http.MethodPost)
+
 	return c
 }
 
 func (c *Controller) Ping(w http.ResponseWriter, r *http.Request) {
 	res, _ := json.Marshal("Hello from Frete Rápido Desafio backend server!")
 	w.Write(res)
+}
+
+func (c *Controller) PostQuote(w http.ResponseWriter, r *http.Request) {
+
 }
