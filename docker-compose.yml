@@ -10,4 +10,5 @@ services:
             POSTGRES_USER: user
             POSTGRES_PASSWORD: password
         container_name: postgres-fr
+        restart: always
       

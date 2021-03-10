@@ -1,14 +1,15 @@
 package cmd
 
 import (
-	"fmt"
-	// "os"
+	"log"
+
+	"github.com/joho/godotenv"
 	"github.com/spf13/cobra"
 )
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-	Use:   "frete-rapido",
+	Use: "frete-rapido-desafio",
 }
 
 func Execute() {
@@ -16,5 +17,9 @@ func Execute() {
 }
 
 func init() {
-	fmt.Println("Iniciando...")
+	err := godotenv.Load(".env")
+
+	if err != nil {
+		log.Println("Error loading .env file: ", err)
+	}
 }
