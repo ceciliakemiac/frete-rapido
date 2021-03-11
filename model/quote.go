@@ -1,7 +1,8 @@
 package model
 
-import "gorm.io/gorm"
+import "time"
 
 type Quote struct {
-	gorm.Model
+	ID        int       `json:"id" gorm:"primaryKey;autoIncrement"`
+	CreatedAt time.Time `json:"created_at" gorm:"not null;default:null"`
 }
