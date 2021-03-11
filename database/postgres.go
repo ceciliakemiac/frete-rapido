@@ -26,6 +26,14 @@ func SetupDatabase() (db *gorm.DB, err error) {
 		return nil, err
 	}
 
+	// if db.Migrator().HasTable(&model.Freight{}) {
+	// 	db.Migrator().DropTable(&model.Freight{})
+	// }
+
+	// if db.Migrator().HasTable(&model.Quote{}) {
+	// 	db.Migrator().DropTable(&model.Quote{})
+	// }
+
 	err = db.AutoMigrate(&model.Quote{}, &model.Freight{})
 	if err != nil {
 		log.Println("Error migrating datagabe: ", err)

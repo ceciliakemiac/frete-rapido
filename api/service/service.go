@@ -32,8 +32,8 @@ func (s *Service) CreateFreight(transporterOffers *model.TransporterOffer) (*[]m
 	transporters := transporterOffers.Transportadoras
 	for _, transporter := range transporters {
 		freight := model.Freight{
-			Cnpj:         transporter.Cnpj,
 			Nome:         transporter.Nome,
+			Servico:      transporter.Servico,
 			PrazoEntrega: transporter.PrazoEntrega,
 			PrecoFrete:   transporter.PrecoFrete,
 			QuoteID:      createdQuote.ID,

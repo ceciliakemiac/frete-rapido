@@ -3,7 +3,6 @@ package controller
 import (
 	"bytes"
 	"encoding/json"
-	"log"
 	"net/http"
 	"os"
 
@@ -43,8 +42,7 @@ func (c *Controller) PostQuote(w http.ResponseWriter, r *http.Request) {
 	var volumeData model.VolumeData
 
 	if err := json.NewDecoder(r.Body).Decode(&volumeData); err != nil {
-		log.Println("Error decoding volumes")
-		http.Error(w, "Error decoding volumes", http.StatusInternalServerError)
+		SendErrorResponse(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
@@ -62,25 +60,25 @@ func (c *Controller) PostQuote(w http.ResponseWriter, r *http.Request) {
 
 	volumesJson, err := json.Marshal(volumeSecureData)
 	if err != nil {
-		log.Println("Error json.Marshal")
+		SendErrorResponse(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 
 	transporterOffers, err := getOffersData(volumesJson)
 	if err != nil {
-		log.Println(err)
-		http.Error(w, "Error getting offers", http.StatusInternalServerError)
+		SendErrorResponse(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	freights, err := c.service.CreateFreight(transporterOffers)
 	if err != nil {
-		http.Error(w, "Error", http.StatusInternalServerError)
+		SendErrorResponse(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	res, err := json.Marshal(freights)
 	w.Header().Set("Content-Type", "application/json")
-	_, _ = w.Write(res)
+	w.Write(res)
 }
 
 func getOffersData(volumes []byte) (*model.TransporterOffer, error) {
