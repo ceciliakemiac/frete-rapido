@@ -1,31 +1,30 @@
 package api
 
 import (
+	"encoding/json"
 	"log"
 	"net/http"
 
 	"github.com/gorilla/mux"
 	"github.com/rs/cors"
-	"gorm.io/gorm"
 
-	"github.com/ceciliakemiac/frete-rapido/api/controller"
+	"github.com/ceciliakemiac/frete-rapido/database"
 )
 
 type Server struct {
-	addr       string
-	router     *mux.Router
-	db         *gorm.DB
-	controller *controller.Controller
+	addr   string
+	router *mux.Router
+	db     *database.Database
 }
 
-func NewServer(addr string, db *gorm.DB) (*Server, error) {
+func NewServer(addr string, db *database.Database) (*Server, error) {
 	s := &Server{
 		addr:   addr,
 		db:     db,
 		router: mux.NewRouter(),
 	}
 
-	s.controller = controller.NewController(s.router, s.db)
+	s.CreateRoutes(s.router, s.db)
 
 	return s, nil
 }
@@ -44,4 +43,17 @@ func (s *Server) Run() error {
 	}
 
 	return nil
+}
+
+func (s *Server) CreateRoutes(router *mux.Router, db *database.Database) {
+	basePath := router.PathPrefix("/api").Subrouter()
+	basePath.Path("").HandlerFunc(s.Ping).Methods(http.MethodGet)
+
+	basePath.Path("/quote").HandlerFunc(s.CreateQuote).Methods(http.MethodPost)
+	basePath.Path("/metrics").HandlerFunc(s.GetMetrics).Methods(http.MethodGet)
+}
+
+func (s *Server) Ping(w http.ResponseWriter, r *http.Request) {
+	res, _ := json.Marshal("Hello from Frete Rápido Desafio backend server!")
+	w.Write(res)
 }

@@ -1,29 +1,18 @@
-package service
+package database
 
 import (
 	"time"
 
 	"github.com/ceciliakemiac/frete-rapido/model"
-	"gorm.io/gorm"
 )
 
-type Service struct {
-	db *gorm.DB
-}
-
-func NewService(db *gorm.DB) *Service {
-	return &Service{
-		db: db,
-	}
-}
-
-func (s *Service) CreateFreight(transporterOffers *model.TransporterOffer) (*[]model.Freight, error) {
+func (db *Database) CreateFreight(transporterOffers *model.TransporterOffer) (*model.Freights, error) {
 	now := time.Now()
 	quote := model.Quote{
 		CreatedAt: now,
 	}
 
-	createdQuote, err := s.createQuote(&quote)
+	createdQuote, err := db.createQuote(&quote)
 	if err != nil {
 		return nil, err
 	}
@@ -42,15 +31,19 @@ func (s *Service) CreateFreight(transporterOffers *model.TransporterOffer) (*[]m
 		freights = append(freights, freight)
 	}
 
-	if err := s.db.Create(&freights).Error; err != nil {
+	if err := db.PG.Create(&freights).Error; err != nil {
 		return nil, err
 	}
 
-	return &freights, nil
+	transportadoras := model.Freights{
+		Transportadoras: freights,
+	}
+
+	return &transportadoras, nil
 }
 
-func (s *Service) createQuote(quote *model.Quote) (*model.Quote, error) {
-	if err := s.db.Create(&quote).Error; err != nil {
+func (db *Database) createQuote(quote *model.Quote) (*model.Quote, error) {
+	if err := db.PG.Create(&quote).Error; err != nil {
 		return nil, err
 	}
 

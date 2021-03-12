@@ -1,4 +1,4 @@
-package controller
+package api
 
 import (
 	"encoding/json"
@@ -25,4 +25,14 @@ func SendErrorResponse(w http.ResponseWriter, message string, statusCode int) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(err.Status)
 	w.Write(response)
+}
+
+func ProcessQueries(params map[string][]string) map[string]string {
+	filters := make(map[string]string)
+	for key, value := range params {
+		if len(value) > 0 {
+			filters[key] = value[0]
+		}
+	}
+	return filters
 }

@@ -4,7 +4,7 @@ services:
     postgres:
         image: postgres:12-alpine
         ports:
-            - "5436:5432"
+            - "5435:5432"
         environment:
             POSTGRES_DB: frete-rapido-desafio
             POSTGRES_USER: user
@@ -17,10 +17,10 @@ services:
         command: server
         environment: 
             POSTGRES_ADDR: postgres-fr:5432
-            API_ADDR: :9095
+            API_ADDR: :9094
         env_file: ./.env
         ports:
-          - "9095:9095"
+          - "9094:9094"
         restart: always
         depends_on: [postgres]
         container_name: server-fr

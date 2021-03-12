@@ -8,3 +8,7 @@ type Freight struct {
 	PrecoFrete   float64 `json:"preco_frete" gorm:"not null;default:null"`
 	QuoteID      int     `json:"quote_id" gorm:"not null;default:null"`
 }
+
+type Freights struct {
+	Transportadoras []Freight `json:"transportadoras"`
+}

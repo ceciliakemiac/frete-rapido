@@ -11,7 +11,11 @@ import (
 	"gorm.io/gorm"
 )
 
-func SetupDatabase() (db *gorm.DB, err error) {
+type Database struct {
+	PG *gorm.DB
+}
+
+func SetupDatabase() (pg *Database, err error) {
 	addr := strings.Split(os.Getenv("POSTGRES_ADDR"), ":")
 	user := os.Getenv("POSTGRES_USERNAME")
 	password := os.Getenv("POSTGRES_PASSWORD")
@@ -19,20 +23,13 @@ func SetupDatabase() (db *gorm.DB, err error) {
 
 	credentials := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable", addr[0], user, password, dbname, addr[1])
 
-	if db, err = gorm.Open(postgres.Open(credentials), &gorm.Config{
+	db, err := gorm.Open(postgres.Open(credentials), &gorm.Config{
 		PrepareStmt: true,
-	}); err != nil {
+	})
+	if err != nil {
 		log.Println("Error getting Postgres Connection: ", err)
 		return nil, err
 	}
-
-	// if db.Migrator().HasTable(&model.Freight{}) {
-	// 	db.Migrator().DropTable(&model.Freight{})
-	// }
-
-	// if db.Migrator().HasTable(&model.Quote{}) {
-	// 	db.Migrator().DropTable(&model.Quote{})
-	// }
 
 	err = db.AutoMigrate(&model.Quote{}, &model.Freight{})
 	if err != nil {
@@ -40,5 +37,9 @@ func SetupDatabase() (db *gorm.DB, err error) {
 		return nil, err
 	}
 
-	return db, nil
+	pg = &Database{
+		PG: db,
+	}
+
+	return pg, nil
 }

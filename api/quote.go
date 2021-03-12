@@ -1,4 +1,4 @@
-package controller
+package api
 
 import (
 	"bytes"
@@ -6,39 +6,10 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/ceciliakemiac/frete-rapido/api/service"
 	"github.com/ceciliakemiac/frete-rapido/model"
-	"github.com/gorilla/mux"
-	"gorm.io/gorm"
 )
 
-type Controller struct {
-	router  *mux.Router
-	db      *gorm.DB
-	service *service.Service
-}
-
-func NewController(router *mux.Router, db *gorm.DB) *Controller {
-	c := &Controller{
-		router:  router,
-		db:      db,
-		service: service.NewService(db),
-	}
-
-	basePath := c.router.PathPrefix("/api").Subrouter()
-	basePath.Path("").HandlerFunc(c.Ping).Methods(http.MethodGet)
-
-	basePath.Path("/quote").HandlerFunc(c.PostQuote).Methods(http.MethodPost)
-
-	return c
-}
-
-func (c *Controller) Ping(w http.ResponseWriter, r *http.Request) {
-	res, _ := json.Marshal("Hello from Frete Rápido Desafio backend server!")
-	w.Write(res)
-}
-
-func (c *Controller) PostQuote(w http.ResponseWriter, r *http.Request) {
+func (s *Server) CreateQuote(w http.ResponseWriter, r *http.Request) {
 	var volumeData model.VolumeData
 
 	if err := json.NewDecoder(r.Body).Decode(&volumeData); err != nil {
@@ -70,15 +41,20 @@ func (c *Controller) PostQuote(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	freights, err := c.service.CreateFreight(transporterOffers)
+	freights, err := s.db.CreateFreight(transporterOffers)
 	if err != nil {
 		SendErrorResponse(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	res, err := json.Marshal(freights)
+	response, err := json.Marshal(freights)
+	if err != nil {
+		SendErrorResponse(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
 	w.Header().Set("Content-Type", "application/json")
-	w.Write(res)
+	w.Write(response)
 }
 
 func getOffersData(volumes []byte) (*model.TransporterOffer, error) {
