@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"strings"
 
 	"github.com/ceciliakemiac/frete-rapido/model"
 	"gorm.io/driver/postgres"
@@ -16,12 +15,13 @@ type Database struct {
 }
 
 func SetupDatabase() (pg *Database, err error) {
-	addr := strings.Split(os.Getenv("POSTGRES_ADDR"), ":")
+	host := os.Getenv("POSTGRES_HOST")
+	port := os.Getenv("POSTGRES_PORT")
 	user := os.Getenv("POSTGRES_USERNAME")
 	password := os.Getenv("POSTGRES_PASSWORD")
 	dbname := os.Getenv("POSTGRES_DATABASE_NAME")
 
-	credentials := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable", addr[0], user, password, dbname, addr[1])
+	credentials := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable", host, user, password, dbname, port)
 
 	db, err := gorm.Open(postgres.Open(credentials), &gorm.Config{
 		PrepareStmt: true,

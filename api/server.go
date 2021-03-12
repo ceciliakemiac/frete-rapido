@@ -1,14 +1,18 @@
 package api
 
 import (
+	"bytes"
 	"encoding/json"
 	"log"
 	"net/http"
+	"os"
+	"time"
 
 	"github.com/gorilla/mux"
 	"github.com/rs/cors"
 
 	"github.com/ceciliakemiac/frete-rapido/database"
+	"github.com/ceciliakemiac/frete-rapido/model"
 )
 
 type Server struct {
@@ -56,4 +60,40 @@ func (s *Server) CreateRoutes(router *mux.Router, db *database.Database) {
 func (s *Server) Ping(w http.ResponseWriter, r *http.Request) {
 	res, _ := json.Marshal("Hello from Frete Rápido Desafio backend server!")
 	w.Write(res)
+}
+
+func HasAccessExternalApi() (bool, error) {
+	accessUrl := os.Getenv("ACCESS_URL")
+	access := &model.Access{
+		Cpnj:             os.Getenv("CNPJ"),
+		Token:            os.Getenv("TOKEN"),
+		CodigoPlataforma: os.Getenv("CODIGO_PLATAFORMA"),
+	}
+
+	client := &http.Client{Timeout: 10 * time.Second}
+
+	accessBody, err := json.Marshal(access)
+	if err != nil {
+		return false, err
+	}
+
+	req, err := http.NewRequest(http.MethodPost, accessUrl, bytes.NewReader(accessBody))
+	if err != nil {
+		return false, err
+	}
+
+	req.Header.Add("Content-Type", "application/json")
+	res, err := client.Do(req)
+	if err != nil {
+		return false, err
+	}
+
+	defer res.Body.Close()
+
+	var block model.Block
+	if err = json.NewDecoder(res.Body).Decode(&block); err != nil {
+		return false, err
+	}
+
+	return !block.Bloqueio, nil
 }

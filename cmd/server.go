@@ -10,6 +10,11 @@ import (
 )
 
 func startServer() {
+	hasAccessExternalApi, err := api.HasAccessExternalApi()
+	if err != nil || !hasAccessExternalApi {
+		log.Fatal("Error Requesting Access to Frete Rapido External API: ", err)
+	}
+
 	db, err := database.SetupDatabase()
 	if err != nil {
 		log.Fatal("startServer() Error Connecting to Database: ", err)
