@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/ceciliakemiac/frete-rapido/model"
 )
@@ -58,7 +59,7 @@ func (s *Server) CreateQuote(w http.ResponseWriter, r *http.Request) {
 }
 
 func getOffersData(volumes []byte) (*model.TransporterOffer, error) {
-	client := &http.Client{}
+	client := &http.Client{Timeout: 10 * time.Second}
 	url := os.Getenv("QUOTE_SIMULATOR_URL")
 
 	req, err := http.NewRequest(http.MethodPost, url, bytes.NewReader(volumes))

@@ -9,7 +9,11 @@ import (
 
 func (db *Database) GetMetrics(filters map[string]string) (*model.Metrics, error) {
 	lastQuotes := filters["last_quotes"]
-	lastQuotesNum, _ := strconv.Atoi(lastQuotes)
+
+	lastQuotesNum, err := strconv.Atoi(lastQuotes)
+	if err != nil && lastQuotesNum == 0 {
+		lastQuotesNum = -1
+	}
 
 	transportersMetrics, err := db.getTransportersMetrics(lastQuotesNum)
 	if err != nil {
@@ -39,7 +43,7 @@ func (db *Database) getTransportersMetrics(lastQuotes int) ([]model.Metric, erro
 	var metrics []model.Metric
 	var query = queryGetMetrics
 
-	if lastQuotes > 0 {
+	if lastQuotes >= 0 {
 		query = fmt.Sprintf(queryGetMetricsLastQuotes, lastQuotes)
 	}
 
@@ -54,7 +58,7 @@ func (db *Database) getMinimumPrice(lastQuotes int) (model.ValueFreight, error) 
 	var minFreight model.ValueFreight
 	query := fmt.Sprintf(queryPrice, "min")
 
-	if lastQuotes > 0 {
+	if lastQuotes >= 0 {
 		query = fmt.Sprintf(queryPriceLastQuotes, lastQuotes, "min", lastQuotes)
 	}
 
@@ -69,7 +73,7 @@ func (db *Database) getMaximumPrice(lastQuotes int) (model.ValueFreight, error) 
 	var maxFreight model.ValueFreight
 	query := fmt.Sprintf(queryPrice, "max")
 
-	if lastQuotes > 0 {
+	if lastQuotes >= 0 {
 		query = fmt.Sprintf(queryPriceLastQuotes, lastQuotes, "max", lastQuotes)
 	}
 

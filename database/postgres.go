@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 
 	"github.com/ceciliakemiac/frete-rapido/model"
 	"gorm.io/driver/postgres"
@@ -15,13 +16,12 @@ type Database struct {
 }
 
 func SetupDatabase() (pg *Database, err error) {
-	host := os.Getenv("POSTGRES_HOST")
-	port := os.Getenv("POSTGRES_PORT")
+	addr := strings.Split(os.Getenv("POSTGRES_ADDR"), ":")
 	user := os.Getenv("POSTGRES_USERNAME")
 	password := os.Getenv("POSTGRES_PASSWORD")
 	dbname := os.Getenv("POSTGRES_DATABASE_NAME")
 
-	credentials := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable", host, user, password, dbname, port)
+	credentials := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable", addr[0], user, password, dbname, addr[1])
 
 	db, err := gorm.Open(postgres.Open(credentials), &gorm.Config{
 		PrepareStmt: true,
@@ -33,7 +33,7 @@ func SetupDatabase() (pg *Database, err error) {
 
 	err = db.AutoMigrate(&model.Quote{}, &model.Freight{})
 	if err != nil {
-		log.Println("Error migrating datagabe: ", err)
+		log.Println("Error migrating database: ", err)
 		return nil, err
 	}
 

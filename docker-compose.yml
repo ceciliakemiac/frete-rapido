@@ -4,7 +4,7 @@ services:
     postgres:
         image: postgres:12-alpine
         ports:
-            - "5435:5432"
+            - "5436:5432"
         environment:
             POSTGRES_DB: frete-rapido-desafio
             POSTGRES_USER: user
