@@ -1,12 +1,17 @@
 package database
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/ceciliakemiac/frete-rapido/model"
 )
 
 func (db *Database) CreateFreight(transporterOffers *model.TransporterOffer) (*model.Freights, error) {
+	if transporterOffers == nil || len(transporterOffers.Transportadoras) == 0 {
+		return nil, fmt.Errorf("CreateFreight: TransporterOffers nil or invalid")
+	}
+
 	now := time.Now()
 	quote := model.Quote{
 		CreatedAt: now,
