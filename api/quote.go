@@ -3,6 +3,7 @@ package api
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"os"
 	"time"
@@ -18,16 +19,14 @@ func (s *Server) CreateQuote(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	remetente := &model.Remetente{
+	remetente := model.Remetente{
 		Cnpj: os.Getenv("CNPJ"),
 	}
 
-	volumeSecureData := &model.VolumeSecureData{
-		Remetente:        *remetente,
-		Destinatario:     volumeData.Destinatario,
-		Volumes:          volumeData.Volumes,
-		Token:            os.Getenv("TOKEN"),
-		CodigoPlataforma: os.Getenv("CODIGO_PLATAFORMA"),
+	volumeSecureData, err := getVolumeSecureData(&volumeData, &remetente)
+	if err != nil {
+		SendErrorResponse(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 
 	volumesJson, err := json.Marshal(volumeSecureData)
@@ -58,7 +57,27 @@ func (s *Server) CreateQuote(w http.ResponseWriter, r *http.Request) {
 	w.Write(response)
 }
 
+func getVolumeSecureData(volume *model.VolumeData, remetente *model.Remetente) (*model.VolumeSecureData, error) {
+	if volume == nil || remetente == nil {
+		return nil, fmt.Errorf("GetVolumeSecureData: Volume or Remetente are invalid")
+	}
+
+	volumeSecureData := &model.VolumeSecureData{
+		Remetente:        *remetente,
+		Destinatario:     volume.Destinatario,
+		Volumes:          volume.Volumes,
+		Token:            os.Getenv("TOKEN"),
+		CodigoPlataforma: os.Getenv("CODIGO_PLATAFORMA"),
+	}
+
+	return volumeSecureData, nil
+}
+
 func getOffersData(volumes []byte) (*model.TransporterOffer, error) {
+	if volumes == nil || len(volumes) == 0 {
+		return nil, fmt.Errorf("GetOffersData: Volumes are nil or invalid")
+	}
+
 	client := &http.Client{Timeout: 10 * time.Second}
 	url := os.Getenv("QUOTE_SIMULATOR_URL")
 

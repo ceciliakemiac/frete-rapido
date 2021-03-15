@@ -8,10 +8,16 @@ import (
 )
 
 func (db *Database) GetMetrics(filters map[string]string) (*model.Metrics, error) {
-	lastQuotes := filters["last_quotes"]
+	var lastQuotesNum int
 
-	lastQuotesNum, err := strconv.Atoi(lastQuotes)
-	if err != nil && lastQuotesNum == 0 {
+	if val, ok := filters["last_quotes"]; ok {
+		lastQuotes := val
+
+		lastQuotesNum, _ = strconv.Atoi(lastQuotes)
+		if lastQuotesNum < 0 {
+			lastQuotesNum = 0
+		}
+	} else {
 		lastQuotesNum = -1
 	}
 
